@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Iconos - Tienda Campus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #4f46e5;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .instructions {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4f46e5;
+        }
+        .instructions h3 {
+            color: #4f46e5;
+            margin-bottom: 10px;
+        }
+        .instructions ol {
+            margin-left: 20px;
+            color: #555;
+            line-height: 1.8;
+        }
+        .btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px 5px;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        .icon-item:hover {
+            border-color: #4f46e5;
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.2);
+        }
+        .icon-item canvas {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .icon-size {
+            color: #4f46e5;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .download-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        .download-btn:hover {
+            background: #059669;
+        }
+        .color-picker-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #fef3c7;
+            border-radius: 10px;
+            border-left: 4px solid #f59e0b;
+        }
+        .color-picker-section h3 {
+            color: #d97706;
+            margin-bottom: 15px;
+        }
+        .color-controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .color-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .color-input-group label {
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="color"] {
+            width: 100px;
+            height: 50px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 5px;
+            font-size: 1em;
+            width: 300px;
+        }
+        .download-all {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Generador de Iconos PWA</h1>
+        <p class="subtitle">Tienda Campus - Universidad XYZ</p>
+
+        <div class="instructions">
+            <h3>📝 Instrucciones:</h3>
+            <ol>
+                <li>Personaliza los colores de fondo y texto del ícono</li>
+                <li>Cambia el texto si lo deseas (por defecto "TC")</li>
+                <li>Haz clic en "Generar Iconos"</li>
+                <li>Descarga cada ícono individualmente o todos de una vez</li>
+                <li>Coloca los archivos .png en la carpeta raíz de tu proyecto PWA</li>
+            </ol>
+        </div>
+
+        <div class="color-picker-section">
+            <h3>🎨 Personalización</h3>
+            <div class="color-controls">
+                <div class="color-input-group">
+                    <label>Color de fondo:</label>
+                    <input type="color" id="bgColor" value="#4f46e5">
+                </div>
+                <div class="color-input-group">
+                    <label>Color del texto:</label>
+                    <input type="color" id="textColor" value="#ffffff">
+                </div>
+                <div class="color-input-group">
+                    <label>Texto del ícono:</label>
+                    <input type="text" id="iconText" value="TC" maxlength="3">
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <button class="btn" onclick="generateIcons()">✨ Generar Iconos</button>
+        </div>
+
+        <div id="iconGrid" class="icon-grid"></div>
+
+        <div class="download-all">
+            <button class="btn" onclick="downloadAll()" id="downloadAllBtn" style="display: none;">
+                📥 Descargar Todos los Iconos (ZIP)
+            </button>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            ✅ ¡Iconos generados correctamente! Puedes descargarlos individualmente o todos juntos.
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        let generatedCanvases = {};
+
+        function generateIcons() {
+            const bgColor = document.getElementById('bgColor').value;
+            const textColor = document.getElementById('textColor').value;
+            const iconText = document.getElementById('iconText').value || 'TC';
+            const grid = document.getElementById('iconGrid');
+            
+            grid.innerHTML = '';
+            generatedCanvases = {};
+
+            sizes.forEach(size => {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, 0, size, size);
+
+                ctx.fillStyle = textColor;
+                ctx.font = `bold ${size * 0.4}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(iconText, size / 2, size / 2);
+
+                generatedCanvases[size] = canvas;
+
+                const iconItem = document.createElement('div');
+                iconItem.className = 'icon-item';
+                iconItem.innerHTML = `
+                    <div class="icon-size">${size}x${size}px</div>
+                    <canvas width="${size}" height="${size}"></canvas>
+                    <button class="download-btn" onclick="downloadIcon(${size})">
+                        Descargar
+                    </button>
+                `;
+
+                const displayCanvas = iconItem.querySelector('canvas');
+                const displayCtx = displayCanvas.getContext('2d');
+                displayCtx.drawImage(canvas, 0, 0);
+
+                grid.appendChild(iconItem);
+            });
+
+            document.getElementById('downloadAllBtn').style.display = 'inline-block';
+            document.getElementById('successMessage').style.display = 'block';
+        }
+
+        function downloadIcon(size) {
+            const canvas = generatedCanvases[size];
+            const link = document.createElement('a');
+            link.download = `icon-${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        async function downloadAll() {
+            const zip = new JSZip();
+            const folder = zip.folder('iconos-tienda-campus');
+
+            for (let size of sizes) {
+                const canvas = generatedCanvases[size];
+                const dataUrl = canvas.toDataURL('image/png');
+                const base64Data = dataUrl.split(',')[1];
+                folder.file(`icon-${size}.png`, base64Data, {base64: true});
+            }
+
+            const content = await zip.generateAsync({type: 'blob'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = 'iconos-tienda-campus.zip';
+            link.click();
+        }
+
+        window.onload = function() {
+            generateIcons();
+        };
+    </script>
+</body>
+</html>

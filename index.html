@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tienda Campus - Universidad XYZ. Papelería, electrónica y snacks para estudiantes.">
+    <meta name="theme-color" content="#4f46e5">
+    <title>Tienda Campus - Universidad XYZ</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Tienda Campus">
+    <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        .offline-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #f59e0b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-in;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <header class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    <h1 class="text-3xl font-bold">Tienda Campus</h1>
+                </div>
+                <div id="connection-status" class="flex items-center gap-2 text-sm bg-white/20 px-3 py-1 rounded-full">
+                    <svg id="wifi-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+                    </svg>
+                    <span id="connection-text">En línea</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-md sticky top-0 z-10">
+        <div class="container mx-auto px-4">
+            <ul class="flex gap-2" id="menu-tabs">
+                <li>
+                    <button onclick="changeCategory('papeleria')" 
+                            class="tab-button px-6 py-4 font-semibold transition-all text-indigo-600 border-b-4 border-indigo-600" 
+                            data-category="papeleria">
+                        Papelería
+                    </button>
+                </li>
+                <li>
+                    <button onclick="changeCategory('electronica')" 
+                            class="tab-button px-6 py-4 font-semibold transition-all text-gray-600 hover:text-indigo-500 hover:bg-gray-50" 
+                            data-category="electronica">
+                        Electrónica
+                    </button>
+                </li>
+                <li>
+                    <button onclick="changeCategory('snacks')" 
+                            class="tab-button px-6 py-4 font-semibold transition-all text-gray-600 hover:text-indigo-500 hover:bg-gray-50" 
+                            data-category="snacks">
+                        Snacks
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 container mx-auto px-4 py-8 min-h-screen">
+        <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+            <h2 id="category-title" class="text-2xl font-bold text-gray-800 mb-6 capitalize">
+                Papelería
+            </h2>
+            <div id="offline-alert" class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 hidden">
+                <p class="text-yellow-800">
+                    ⚠️ Estás viendo contenido almacenado. Conecta a internet para ver actualizaciones.
+                </p>
+            </div>
+            <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6 mt-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-lg font-semibold">Universidad XYZ – Tienda Campus 2025</p>
+            <p class="text-sm text-gray-400 mt-2">
+                Progressive Web App | Funciona offline
+            </p>
+            <div class="mt-4 flex justify-center gap-4 text-sm">
+                <span id="sw-status" class="text-gray-400">Service Worker: Cargando...</span>
+            </div>
+        </div>
+    </footer>
+
+    <div id="offline-indicator" class="offline-indicator hidden">
+        📡 Sin conexión a internet
+    </div>
+
+    <script>
+        const productsData = {
+            papeleria: [
+                { id: 1, nombre: 'Cuaderno Universitario', precio: 25.00, descripcion: '100 hojas rayadas' },
+                { id: 2, nombre: 'Bolígrafos (Pack 5)', precio: 15.00, descripcion: 'Colores variados' },
+                { id: 3, nombre: 'Marcadores Fluorescentes', precio: 30.00, descripcion: 'Set de 6 colores' }
+            ],
+            electronica: [
+                { id: 4, nombre: 'USB 32GB', precio: 120.00, descripcion: 'Alta velocidad USB 3.0' },
+                { id: 5, nombre: 'Mouse Inalámbrico', precio: 180.00, descripcion: 'Ergonómico 2.4GHz' },
+                { id: 6, nombre: 'Audífonos Básicos', precio: 95.00, descripcion: 'Con micrófono' }
+            ],
+            snacks: [
+                { id: 7, nombre: 'Galletas Integrales', precio: 12.00, descripcion: 'Paquete de 200g' },
+                { id: 8, nombre: 'Jugo Natural 500ml', precio: 18.00, descripcion: 'Sabores variados' },
+                { id: 9, nombre: 'Barra de Granola', precio: 15.00, descripcion: 'Con miel y nueces' }
+            ]
+        };
+
+        let currentCategory = 'papeleria';
+        let isOnline = navigator.onLine;
+
+        function changeCategory(category) {
+            currentCategory = category;
+            document.getElementById('category-title').textContent = 
+                category.charAt(0).toUpperCase() + category.slice(1);
+            document.querySelectorAll('.tab-button').forEach(button => {
+                if (button.dataset.category === category) {
+                    button.className = 'tab-button px-6 py-4 font-semibold transition-all text-indigo-600 border-b-4 border-indigo-600';
+                } else {
+                    button.className = 'tab-button px-6 py-4 font-semibold transition-all text-gray-600 hover:text-indigo-500 hover:bg-gray-50';
+                }
+            });
+            loadProducts(category);
+        }
+
+        function loadProducts(category) {
+            const container = document.getElementById('products-container');
+            const products = productsData[category];
+            container.innerHTML = '';
+            products.forEach(producto => {
+                const card = document.createElement('div');
+                card.className = 'border border-gray-200 rounded-lg p-5 hover:shadow-xl transition-shadow bg-gradient-to-br from-white to-gray-50';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-3">
+                        <h3 class="font-semibold text-lg text-gray-800">
+                            ${producto.nombre}
+                        </h3>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">${producto.descripcion}</p>
+                    <div class="flex items-center justify-between mt-4">
+                        <span class="text-2xl font-bold text-indigo-600">
+                            $${producto.precio.toFixed(2)}
+                        </span>
+                        <button onclick="addToCart(${producto.id})" 
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                            Agregar
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function addToCart(productId) {
+            alert(`Producto ${productId} agregado al carrito`);
+        }
+
+        function updateConnectionStatus(online) {
+            isOnline = online;
+            const statusDiv = document.getElementById('connection-status');
+            const statusText = document.getElementById('connection-text');
+            const wifiIcon = document.getElementById('wifi-icon');
+            const offlineAlert = document.getElementById('offline-alert');
+            const offlineIndicator = document.getElementById('offline-indicator');
+            if (online) {
+                statusText.textContent = 'En línea';
+                statusDiv.className = 'flex items-center gap-2 text-sm bg-white/20 px-3 py-1 rounded-full';
+                wifiIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>';
+                offlineAlert.classList.add('hidden');
+                offlineIndicator.classList.add('hidden');
+            } else {
+                statusText.textContent = 'Sin conexión';
+                statusDiv.className = 'flex items-center gap-2 text-sm bg-red-500 px-3 py-1 rounded-full';
+                wifiIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414"></path>';
+                offlineAlert.classList.remove('hidden');
+                offlineIndicator.classList.remove('hidden');
+            }
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then((registration) => {
+                        console.log('Service Worker registrado:', registration.scope);
+                        document.getElementById('sw-status').textContent = 'Service Worker: Activo ✓';
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    if (confirm('¡Nueva versión disponible! ¿Deseas actualizar?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('Error al registrar Service Worker:', error);
+                        document.getElementById('sw-status').textContent = 'Service Worker: Error ✗';
+                    });
+            });
+        } else {
+            document.getElementById('sw-status').textContent = 'Service Worker: No disponible';
+        }
+
+        window.addEventListener('online', () => {
+            updateConnectionStatus(true);
+        });
+        
+        window.addEventListener('offline', () => {
+            updateConnectionStatus(false);
+        });
+
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        window.addEventListener('appinstalled', () => {
+            deferredPrompt = null;
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts(currentCategory);
+            updateConnectionStatus(navigator.onLine);
+        });
+    </script>
+</body>
+</html>
